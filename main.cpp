@@ -18,6 +18,7 @@ class MyVector{
     
     void push_back(type);
     type pop_back();
+    int getCapacity() const;
   private:
     int size; // nb of elements
     int capacity; //nb of allocated bytes
@@ -74,6 +75,23 @@ void MyVector::push_back(type a){
     ptr[size] = a;
     size++;
 }
+type MyVector::pop_back(){
+    type a = ptr[size-1];
+    size--;
+    if (capacity >= size*4){
+        type* old = ptr;
+        capacity /= 2;
+        ptr = new type [capacity];
+        memcpy(ptr,old,size*sizeof(type));
+        delete [] old;
+        
+    }
+    return a;
+
+}
+int MyVector::getCapacity() const{
+    return capacity;
+}
 //driver program
 int main(){
     type tab [] = {1,2,3,4,5};
@@ -85,5 +103,17 @@ int main(){
     cout << "v1 = " << v1 << endl;
     v1.push_back(6);
     cout << "v1=" << v1 << endl;
+    type a = v1.pop_back();
+    cout << a << endl;
+    type b = v1.pop_back();
+    cout << b << endl;
+    type c = v1.pop_back();
+    cout << c << endl;
+    type d = v1.pop_back();
+    cout << d << endl;
+    type e = v1.pop_back();
+    cout << e << endl;
+    cout << "v1 = " << v1 << endl;
+    cout << v1.getCapacity() << endl;
     return 0;
 }
