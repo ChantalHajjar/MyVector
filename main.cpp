@@ -24,6 +24,7 @@ class MyVector{
     int size; // nb of elements
     int capacity; //nb of allocated bytes
     type* ptr; //pointer to the array base
+   
     friend ostream& operator<<(ostream&, const MyVector&);
     friend void swap(MyVector&, MyVector&);
 };
@@ -51,6 +52,13 @@ MyVector::MyVector(type* p, int n)
    memcpy(ptr,p,size*sizeof(type));
 }
 
+MyVector& MyVector::operator+=(const MyVector& v){
+  for (size_t i = 0; i < v.size; i++)
+  {
+    (*this).push_back(v[i]);
+  }
+  return *this;
+}
 MyVector::~MyVector()
 {
     delete[] ptr;
@@ -142,29 +150,32 @@ int main(){
 
     type tab [] = {1,2,3,4,5};
     MyVector v1(tab,5);
+    
     v1.push_back(6);
     cout << "v1 = " << v1 << endl;
     MyVector v2;
     v2.push_back(8);
     v2.push_back(20);
     cout << "v2 = " << v2 << endl;
-    MyVector v3(v2);
-    cout << "v3 = " << v3 << endl;
-    v3.push_back(50);
-    cout << "v2 = " << v2 << endl;
-    cout << "v3 = " << v3 << endl;
-    v1.pop_back();
-    cout << "v1 = " << v1 << endl;
-    cout << "v1[0] = " << v1[0] << endl;
-    v1[0] = 9;
-    cout << "v1 = " << v1 << endl;
-    cout << "overloading = operator" << endl;
-    v2 = v1;
-    cout << "v1 = " << v1 << endl;
-    cout << "v2 = " << v2 << endl;
-    v2.push_back(7);
-    v1.push_back(100);
-    cout << "v1 = " << v1 << endl; 
-    cout << "v2 = " << v2 << endl;
+    (v1 += v2) += v2;
+    cout << "v1+=v2 " << v1 << endl;  
+    // MyVector v3(v2);
+    // cout << "v3 = " << v3 << endl;
+    // v3.push_back(50);
+    // cout << "v2 = " << v2 << endl;
+    // cout << "v3 = " << v3 << endl;
+    // v1.pop_back();
+    // cout << "v1 = " << v1 << endl;
+    // cout << "v1[0] = " << v1[0] << endl;
+    // v1[0] = 9;
+    // cout << "v1 = " << v1 << endl;
+    // cout << "overloading = operator" << endl;
+    // v2 = v1;
+    // cout << "v1 = " << v1 << endl;
+    // cout << "v2 = " << v2 << endl;
+    // v2.push_back(7);
+    // v1.push_back(100);
+    // cout << "v1 = " << v1 << endl; 
+    // cout << "v2 = " << v2 << endl;
     return 0;
 }
