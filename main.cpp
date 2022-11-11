@@ -23,7 +23,7 @@ class MyVector{
   private:
     int size; // nb of elements
     int capacity; //nb of allocated bytes
-    type* ptr; //pointer to the array base
+    unique_ptr<type []> ptr; //pointer to the array base
     friend ostream& operator<<(ostream&, const MyVector&);
     friend void swap(MyVector&, MyVector&);
 };
@@ -35,26 +35,25 @@ const MyVector operator+(MyVector v1, const MyVector& v2);
 // implementation
 
 MyVector::MyVector(int c)
-:capacity(c), size(0), ptr(new type[capacity])
+:capacity(c), size(0), ptr(make_unique <type[]>(capacity))
 {
   for (int i = 0; i < c ;++i){
     ptr[i] = 0;
   }
 } 
 MyVector::MyVector(type* p, int n)
-: capacity(n), size(n), ptr( new type [capacity])
+: capacity(n), size(n), ptr( make_unique <type[]>(capacity))
 {
 
 //    for (int i = 0; i < size; ++i){
 //     ptr[i] = p[i];
 //    }
-   memcpy(ptr,p,size*sizeof(type));
+   memcpy(ptr.get(),p,size*sizeof(type));
 }
 
 MyVector::~MyVector()
 {
-    delete[] ptr;
-    ptr = nullptr;
+  cout << "Bye" << endl;
 }
 
 MyVector& MyVector::operator=(MyVector v)
@@ -64,9 +63,9 @@ MyVector& MyVector::operator=(MyVector v)
 }
 
 MyVector::MyVector(const MyVector& v)
-:capacity(v.capacity), size(v.size), ptr(new type [capacity])
+:capacity(v.capacity), size(v.size), ptr(make_unique <type[]>(capacity))
 {
-  memcpy(ptr,v.ptr,size*sizeof(type));
+  memcpy(ptr.get(),v.ptr.get(),size*sizeof(type));
 }
 
 const type MyVector::operator[](int i) const
@@ -93,15 +92,21 @@ ostream& operator<<(ostream& os, const MyVector& v)
 void MyVector::push_back(type a)
 {
     if (size == capacity){
-        type* old = ptr;
-        ptr = new type [capacity*2];
-        memcpy(ptr,old,size*sizeof(type));
-        delete[] old;
-        capacity *= 2;
-        for (int i=size; i < capacity; ++i){
-            ptr[i] = 0;
-        }
+      capacity *= 2;
+       unique_ptr <type []> newptr = make_unique <type []> (capacity);
+       for (size_t i = 0; i < size; i++)
+       {
+          newptr[i] = ptr[i];
+       }
+
+       newptr.swap(ptr);
+       for (size_t i = size; i < capacity; i++)
+       {
+         ptr[i] = 0;
+       }
+       
     }
+    
     ptr[size] = a;
     size++;
 }
@@ -110,11 +115,10 @@ type MyVector::pop_back()
     type a = ptr[size-1];
     size--;
     if (capacity >= size*4){
-        type* old = ptr;
         capacity /= 2;
-        ptr = new type [capacity];
-        memcpy(ptr,old,size*sizeof(type));
-        delete [] old;
+        unique_ptr <type []> newptr = make_unique <type []> (capacity);
+        memcpy(newptr.get(),ptr.get(),size*sizeof(type));
+        newptr.swap(ptr);
         
     }
     return a;
@@ -134,8 +138,8 @@ void swap(MyVector& v1, MyVector& v2)
   using std::swap;
   swap(v1.capacity, v2.capacity);
   swap(v1.size, v2.size);
-  swap(v1.ptr, v2.ptr);
-}
+  v2.ptr.swap(v1.ptr);
+ }
 
 //driver program. must be in a separate file
 int main(){
