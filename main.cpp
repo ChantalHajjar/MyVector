@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 typedef int type;
 
@@ -138,7 +139,7 @@ void swap(MyVector& v1, MyVector& v2)
   using std::swap;
   swap(v1.capacity, v2.capacity);
   swap(v1.size, v2.size);
-  v2.ptr.swap(v1.ptr);
+  swap(v1.ptr,v2.ptr);
  }
 
 //driver program. must be in a separate file
